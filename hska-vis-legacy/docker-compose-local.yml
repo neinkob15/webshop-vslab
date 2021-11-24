@@ -15,6 +15,9 @@ services:
     build:
       context: ./
       dockerfile: ./docker/DockerfileMySQL
+    volumes:
+      - "./.data:/var/lib/mysql"
+      - "./sql:/docker-entrypoint-initdb.d"
     environment:
       MYSQL_ROOT_PASSWORD: c8de110f37300a53a971749
       MYSQL_DATABASE: webshop
@@ -28,7 +31,9 @@ services:
                 - web-shop-db-image
 
   web-shop-products:
-    image: eshopproducts:latest
+    build:
+      context: ../eshop_products/
+      dockerfile: ./Dockerfile
     command: tail -f /dev/null
     environment:
       DB_HOST: web-shop-db-image
@@ -39,7 +44,9 @@ services:
             aliases:
                 - web-shop-products
   web-shop-categories:
-    image: eshopcategories:latest
+    build:
+      context: ../eshop_categories/
+      dockerfile: ./Dockerfile
     command: tail -f /dev/null
     environment:
       DB_HOST: web-shop-db-image

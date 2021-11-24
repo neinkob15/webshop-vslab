@@ -1,5 +1,2 @@
 FROM mysql:5.7.9
 
-ADD ./sql/create-tables.sql /docker-entrypoint-initdb.d/create-tables.sql
-ADD ./sql/initial.sql /docker-entrypoint-initdb.d/initial.sql
-ADD ./sql/initial-products.sql /docker-entrypoint-initdb.d/initial-products.sql
