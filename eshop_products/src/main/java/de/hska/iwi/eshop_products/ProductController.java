@@ -42,7 +42,7 @@ public class ProductController implements ProductManager {
       } catch (ProductNotFoundException e) {}
       return l;
     } else if (searchValue.isPresent() || minPrice.isPresent() || maxPrice.isPresent()) {
-      List<Product> products = this.getProductsForSearchValues(searchValue.orElse(null), minPrice.orElse(null), maxPrice.orElse(null));
+      List<Product> products = this.getProductsForSearchValues(searchValue, minPrice, maxPrice);
       for (int i = 0; i < products.size(); i++) {
         Product temp = products.get(i);
         temp.setCategory(categoryManager.getById(products.get(i).getCategoryId()));
@@ -92,8 +92,17 @@ public class ProductController implements ProductManager {
   }
 
   @Override
-  public List<Product> getProductsForSearchValues(String searchValue, Double minPrice, Double maxPrice) {
-    return productRepository.search(searchValue, minPrice, maxPrice);
+  public List<Product> getProductsForSearchValues(Optional<String> searchValue, Optional<Double> minPrice, Optional<Double> maxPrice) {
+    if(searchValue.isPresent()) {
+      if(minPrice.isPresent() && maxPrice.isPresent()) {
+        return productRepository.findByNameLikeOrDetailsLikeAndPriceBetween(searchValue.get(),searchValue.get(),
+                minPrice.get(), maxPrice.get());
+      }
+      return productRepository.findByNameLikeOrDetailsLike(searchValue.get(),searchValue.get());
+    } else if(minPrice.isPresent() && maxPrice.isPresent()) {
+        return productRepository.findByPriceBetween(minPrice.get(), maxPrice.get());
+    }
+    return new ArrayList<Product>();
   }
 
   @Override

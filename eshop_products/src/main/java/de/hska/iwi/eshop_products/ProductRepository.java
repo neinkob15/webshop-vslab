@@ -23,4 +23,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
          + "AND ((:priceMax IS NULL) OR (p.price <= :priceMax)) "
          )
     List<Product> search(String searchValue, Double priceMin, Double priceMax);
+
+    List<Product> findByNameLikeOrDetailsLike(String searchName, String searchDetails);
+    List<Product> findByPriceBetween(Double priceMin, Double priceMax);
+    List<Product> findByNameLikeOrDetailsLikeAndPriceBetween(String searchName, String searchDetails, Double priceMin, Double priceMax);
 }
