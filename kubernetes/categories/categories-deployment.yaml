@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-shop-categories
+spec:
+  type: NodePort
+  ports:
+  - port: 8082
+    nodePort: 32382
+  selector:
+    app: categories
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: categories
+spec:
+  selector:
+    matchLabels:
+      app: categories
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: categories
+    spec:
+      containers:
+      - image: web-shop-categories:latest
+        name: categories
+        imagePullPolicy: Never
+        env:
+          # Use secret in real usage
+        - name: DB_HOST
+          value: mysql
+        ports:
+        - containerPort: 8082
+          name: categories

@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-shop-products
+spec:
+  type: NodePort
+  ports:
+  - port: 8081
+    nodePort: 32381
+  selector:
+    app: products
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products
+spec:
+  selector:
+    matchLabels:
+      app: products
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: products
+    spec:
+      containers:
+      - image: web-shop-products:latest
+        name: products
+        imagePullPolicy: Never
+        env:
+          # Use secret in real usage
+        - name: DB_HOST
+          value: mysql
+        ports:
+        - containerPort: 8081
+          name: products
