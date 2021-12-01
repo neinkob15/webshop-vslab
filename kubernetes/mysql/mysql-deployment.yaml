@@ -1,0 +1,149 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  type: NodePort
+  ports:
+  - port: 3306
+    nodePort: 32306
+  selector:
+    app: mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.7.9
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: c8de110f37300a53a971749
+        - name: MYSQL_DATABASE
+          value: webshop
+        - name: MYSQL_USER
+          value: webshopuser
+        - name: MYSQL_PASSWORD
+          value: 240b2c6d58ff2ce2f508b49f
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-initdb
+          mountPath: /docker-entrypoint-initdb.d
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-initdb
+        configMap:
+          name: mysql-initdb-config
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  01-create-tables.sql: |
+    use webshop;
+    CREATE TABLE category (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+    
+    CREATE TABLE role (
+        id INT NOT NULL AUTO_INCREMENT,
+        level1 INT,
+        type VARCHAR(255),
+        PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+    
+    CREATE TABLE product (
+        id INT NOT NULL AUTO_INCREMENT,
+        details VARCHAR(255),
+        name VARCHAR(255),
+        price DOUBLE,
+        category_id INT,
+        PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+    
+    CREATE TABLE customer (
+        id INT NOT NULL AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL,
+        lastname VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        username VARCHAR(255) NOT NULL,
+        role INT NOT NULL,
+        PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+    
+    CREATE UNIQUE INDEX UK_mufchskagt7e1w4ksmt9lum5l ON customer (username ASC);
+    
+    CREATE INDEX FK74aoh99stptslhotgf41fitt0 ON customer (role ASC);
+    
+    CREATE INDEX FK1mtsbur82frn64de7balymq9s ON product (category_id ASC);
+  02-initial.sql: |
+    USE webshop;
+    insert into `role` (`level1`, `type`) values(0, 'admin');
+    insert into `role` (`level1`, `type`) values(1, 'user');
+    
+    insert ignore into `customer` (`name`, `lastname`, `password`, `username`, `role`) values('admin', 'admin', 'admin', 'admin', 1);
+  03-initial-categories.sql: |
+    CREATE DATABASE IF NOT EXISTS `categories`;
+    GRANT ALL PRIVILEGES ON `categories`.* TO 'webshopuser'@'%';
+    
+    USE `categories`;
+    
+    CREATE TABLE IF NOT EXISTS category (
+                                        id INT NOT NULL AUTO_INCREMENT,
+                                        name VARCHAR(255) NOT NULL,
+                                        PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+    
+    USE `categories`;
+    
+    insert into category (id,name) VALUES (1, 'Wahlessen 1');
+    insert into category (id,name) VALUES (2, 'Wahlessen 2');
+    insert into category (id,name) VALUES (3, 'Aktionstheke');
+    insert into category (id,name) VALUES (4, 'Gut & Günstig');
+    insert into category (id,name) VALUES (5, 'Buffet');
+    insert into category (id,name) VALUES (6, 'Schnitzelbar');
+    insert into category (id,name) VALUES (7, 'Curry Queen');
+  04-initial-products.sql: |
+    CREATE DATABASE IF NOT EXISTS `products`;
+    GRANT ALL PRIVILEGES ON `products`.* TO 'webshopuser'@'%';
+    
+    USE `products`;
+    
+    CREATE TABLE IF NOT EXISTS product (
+      id INT NOT NULL AUTO_INCREMENT,
+      details VARCHAR(255) DEFAULT '',
+      name VARCHAR(255) NOT NULL,
+      price DOUBLE,
+      category_id INT,
+      PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+    
+    CREATE UNIQUE INDEX UK_sakjdhgouew7zgfru ON product(name);
+    
+    USE `products`;
+    
+    insert into product(name,price,category_id) VALUES ('Currywurst', 2.00, 3);
+    insert into product(name,price,category_id) VALUES ('Kartoffeleintopf', 2.60, 4);
+    insert into product(name,price,category_id) VALUES ('Schnitzel', 2.60, 6);
+    insert into product(name,price,category_id) VALUES ('Buffet', 0.83, 5);
