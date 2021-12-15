@@ -29,6 +29,7 @@ spec:
       - image: web-shop-products:latest
         name: products
         imagePullPolicy: Never
+        command: ["tail", "-f", "/dev/null"]
         env:
           # Use secret in real usage
         - name: DB_HOST

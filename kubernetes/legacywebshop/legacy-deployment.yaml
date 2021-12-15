@@ -29,10 +29,11 @@ spec:
       - image: legacywebshop:latest
         name: legacywebshop
         imagePullPolicy: Never
+        command: ["tail", "-f", "/dev/null"]
         env:
           # Use secret in real usage
         - name: DB_HOST
           value: mysql
         ports:
-        - containerPort: 8081
+        - containerPort: 8080
           name: legacywebshop

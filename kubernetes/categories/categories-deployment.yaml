@@ -33,6 +33,7 @@ spec:
           # Use secret in real usage
         - name: DB_HOST
           value: mysql
+        command: ["tail", "-f", "/dev/null"]
         ports:
         - containerPort: 8082
           name: categories
