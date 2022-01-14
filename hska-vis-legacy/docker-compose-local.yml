@@ -50,6 +50,7 @@ services:
     command: tail -f /dev/null
     environment:
       DB_HOST: web-shop-db-image
+      MY_POD_NAME: abc123
     ports:
       - "8082:8082"
     networks:

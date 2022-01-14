@@ -35,6 +35,10 @@ spec:
           # Use secret in real usage
         - name: DB_HOST
           value: mysql
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         ports:
         - containerPort: 8082
           name: categories

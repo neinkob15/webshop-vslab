@@ -1,0 +1,8 @@
+* Starting tunnel for service web-shop-categories.
+|-----------|---------------------|-------------|------------------------|
+| NAMESPACE |        NAME         | TARGET PORT |          URL           |
+|-----------|---------------------|-------------|------------------------|
+| default   | web-shop-categories |             | http://127.0.0.1:63999 |
+|-----------|---------------------|-------------|------------------------|
+http://127.0.0.1:63999
+! Because you are using a Docker driver on windows, the terminal needs to be open to run it.
